@@ -1,6 +1,6 @@
 # Leaflet.js or Mapbox.js Simple Map Tutorial
 
-In this tutorial, we will be working with sample geodata to build a simple map using Leaflet.js and use the same data to build one using Mapbox.js. This will highlight some areas of how Mapbox.js builds on top of Leaflet.js and have a session discussing their uses either or using these tools for different purposes.
+In this tutorial, we will be working with sample geodata to build a simple map using Leaflet.js and use the same data to build one using Mapbox.js. This will highlight some areas of how Mapbox.js builds on top of Leaflet.js and have a session discussing their uses either or using these tools for different purposes. The comments and discussions would help craft this tutorial further to clarify the uses/similarities/differences of these tools for everyone.
 
 Tools needed
  * Clone this repo (Do not clone until 9AM Thursday 5.27.2015, working files not uploaded yet)
