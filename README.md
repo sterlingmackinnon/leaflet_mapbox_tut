@@ -5,6 +5,8 @@ In this tutorial, we will be working with sample geodata (for the upcoming [CicL
 
 The comments and discussions would help iterate this tutorial further to clarify the uses/similarities/differences of these tools for everyone.
 
+The geodata (geojson and shapefiles) are an approximation of the event's route/hubs/and landmarks (Based on the PDF map and route guide for the event) and is provided AS IS for you to view, access, copy, distribute and otherwise use the information at your discretion.
+
 Tools needed
  * [A github account](https://github.com/), required to run your own map.
  * Clone this repo (Do not clone until 9AM Thursday 5.27.2015, working files not uploaded yet)
