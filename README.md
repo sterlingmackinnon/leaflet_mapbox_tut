@@ -1,4 +1,4 @@
-![alt text](https://github.com/maptimeLA/leaflet_mapbox_tut/images/cover.png)
+![alt text](https://raw.githubusercontent.com/maptimeLA/leaflet_mapbox_tut/master/images/cover.png)
 # Leaflet.js or Mapbox.js Simple Map Tutorial
 
 In this tutorial, we will be working with sample geodata to build a simple map using Leaflet.js and use the same data to build one using Mapbox.js. This will highlight some areas of how Mapbox.js builds on top of Leaflet.js and have a session discussing their uses either or using these tools for different purposes. 
