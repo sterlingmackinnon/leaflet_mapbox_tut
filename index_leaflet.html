@@ -4,8 +4,8 @@
 	<title>CicLAvia : Pasadena</title>
 	<meta charset="utf-8" />
 	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -17,15 +17,15 @@
     <div id="info"><h1>CicLAvia : Pasadena</h1><div id="infobox"><h2>3.5 miles of Open Streets!</h2><p>Bike, walk and pogostick down Colorado Blvd!</p> </div> 
     </div>
 	<script>
-        L.mapbox.accessToken = 'pk.eyJ1IjoiY3J1emluNzN2dyIsImEiOiI3RDdhUi1NIn0.jaEqREZw7QQMRafKPNBdmA';    
-        var map = L.mapbox.map('map', 'cruzin73vw.lczhncdi','backtile')
+         var map = L.map('map')
         .setView([34.147844, -118.144392], 16);
+        
         
         //Code to add Basemaps
         var baselayers = {
-        CicLAvia: L.mapbox.tileLayer('cruzin73vw.lczhncdi'),
-        Streets: L.mapbox.tileLayer('examples.map-i87786ca'), 
-        Satellite: L.mapbox.tileLayer('examples.map-igb471ik')
+        CicLAvia: L.tileLayer('https://{s}.tiles.mapbox.com/v4/cruzin73vw.lczhncdi/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY3J1emluNzN2dyIsImEiOiI3RDdhUi1NIn0.jaEqREZw7QQMRafKPNBdmA').addTo(map),
+        Streets: L.tileLayer('https://{s}.tiles.mapbox.com/v4/examples.map-i87786ca/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY3J1emluNzN2dyIsImEiOiI3RDdhUi1NIn0.jaEqREZw7QQMRafKPNBdmA'), 
+        Satellite: L.tileLayer('https://{s}.tiles.mapbox.com/v4/examples.map-igb471ik/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY3J1emluNzN2dyIsImEiOiI3RDdhUi1NIn0.jaEqREZw7QQMRafKPNBdmA')
         };
         
         L.control.layers(baselayers).addTo(map);
@@ -35,27 +35,38 @@
         var hubs="data/ciclavia_hubs.geojson";
         var landmarks="data/ciclavia_landmarks.geojson";
         
-        //Style Hubs and add to Map
-        var featureLayer = L.mapbox.featureLayer(hubs,{
-            style:{
+        //Styles and loads the Hubs
+        $.getJSON(hubs, function(data) {
+        var hubsLayer = L.geoJson(data, {
+                style:{
                 fillColor:"#ff7f00",
                 color: "#000",
                 weight: 0,
                 opacity: 0,
                 fillOpacity: 0.8
-                }
-        }).addTo(map).bindPopup("Hub");
+                },
+        onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.Hub);
+        }
+        }).addTo(map);
+        });
         
-        //Style Routes and add to Map
-        var featureLayer = L.mapbox.featureLayer(routes,{
-            style:{
+        //Styles and loads the routes
+        $.getJSON(routes, function(data) {
+        var routesLayer = L.geoJson(data, {
+                style:{
                 color: "#ff78b4",
                 weight: 10,
                 },
+        onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.Route);
+        }
         }).addTo(map);
+        });
         
-        //Style Landmarks and add to Map
-        var featureLayer = L.mapbox.featureLayer(landmarks,{
+        //Styles and loads the landmarks
+        $.getJSON(landmarks, function(data) {
+        var landmarksLayer = L.geoJson(data, {
             style:{
                 fillColor:"#ff7f00",
                 color: "#000",
@@ -64,22 +75,14 @@
                 fillOpacity: 0.8
                 },
             pointToLayer: function(feature, latlon) {
-            return L.circleMarker(latlon, 5);
+            return L.circleMarker(latlon, 5).bindPopup("<h2>"+feature.properties.Landmarks+"</h2>"+feature.properties.Info);
             }
         }).addTo(map);
-        
-        
-        featureLayer.on('ready',function(){
-            featureLayer.eachLayer(function(layer){
-            layer.bindPopup("<h2>"+layer.feature.properties.Landmarks+"</h2>"+layer.feature.properties.Info);
-            });
         });
-        
-        
+
         //This code for GPS location
-        var geolocation = L.mapbox.featureLayer().addTo(map);
+        var geolocation = L.layerGroup().addTo(map);
         var mapbounds=map.getBounds();
-        console.log(mapbounds);
         
         var geolocate = document.getElementById('geolocate');
         
@@ -92,27 +95,13 @@
         map.locate();
         };
         }
-        map.on('locationfound', function(e) {
-            
-        if (mapbounds.contains([e.latlng.lng, e.latlng.lat])==true){
-        map.fitBounds(e.bounds);
-
-        geolocation.setGeoJSON({
-        type: 'Feature',
-        geometry: {
-            type: 'Point',
-            coordinates: [e.latlng.lng, e.latlng.lat]
-        },
-        properties: {
-            'title': 'Here I am!',
-            'marker-color': '#ff8888',
-            'marker-symbol': 'star'
-        }
-        });
-
+        map.on('locationfound', function(e) {   
+        L.marker([e.latlng.lat, e.latlng.lng]).addTo(geolocation)
+				.bindPopup("Here I am!").openPopup();
+        map.panTo([e.latlng.lat, e.latlng.lng]);
         // And hide the geolocation button
         geolocate.parentNode.removeChild(geolocate);
-        } else {alert("You must be in the City of Pasadena")}});
+        } );
 
         // If the user chooses not to allow their location
         // to be shared, display an error message.
