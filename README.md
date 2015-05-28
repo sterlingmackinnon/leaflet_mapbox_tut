@@ -13,6 +13,6 @@ The geodata (geojson and shapefiles) are an approximation of the event's route/h
 
 Tools needed
  * [A github account](https://github.com/), required to run your own map.
- * Clone this repo (Do not clone until 9AM Thursday 5.27.2015, working files not uploaded yet)
+ * Clone this repo (Do not clone until 9AM Thursday 5.27.2015, working files not uploaded yet), you can download the ZIP file in the button you see to your right. We can help you setup a github repository for your soon to be live map
  * [Brackets](http://brackets.io/): A text editor for both MAC/PC or similar text editor
  * [A mapbox account](https://www.mapbox.com/signup/)
