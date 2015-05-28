@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Quick Start Guide Example</title>
+	<meta charset="utf-8" />
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+
+    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }    
+</style>    
+</head>
+    
+<body>
+    
+    <!--This DIV creates the area where the map goes-->
+	<div id="map"></div>
+
+	<script>
+        //Leaflet
+        //This variable calls out Leaflet to generate a map with a set of coordinates and zoom level
+        //The 'map' in the Leaflet callout will refer to the DIV with the same name
+		var map = L.map('map').setView([34.0500, -118.2500], 13);
+        
+        //Mapbox
+        //This variable calls out Mapbox to generate a map with a set of coordinates and zoom level
+        //var map = L.mapbox.map('map', 'mapbox.streets').setView([40, -74.50], 9);
+        
+        //This command calls out Leaflet to create a layer with an tileLayer from an external source
+		L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			id: 'examples.map-i875mjb7'
+		}).addTo(map);
+        
+        
+        omnivore.csv('/data/Bikes_Stolen_by_Location.csv').addTo(map);
+ 
+    var ladbscom= $.getJSON('https://data.lacity.org/resource/pbqu-3znk.json', function(data) {
+	$.each(data, function(index, value) {
+        console.log(value);
+        //if (isNaN(value.location_1.latitude)==false && isNaN(value.location_1.longitude)==false ){console.log("Null")} 
+  	});
+	});
+	</script>
+</body>
+</html>

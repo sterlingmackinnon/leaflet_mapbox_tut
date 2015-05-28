@@ -1,79 +1,125 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Leaflet Quick Start Guide Example</title>
+	<title>CicLAvia : Pasadena</title>
 	<meta charset="utf-8" />
-	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-    
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
-    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
-
-<style>
-  body { margin:0; padding:0; }
-  #map { position:absolute; top:0; bottom:0; width:100%; }    
-</style>    
 </head>
-    
 <body>
-    
-    <!--This DIV creates the area where the map goes-->
 	<div id="map"></div>
-
+    <a href='#' id='geolocate' class='ui-button'>Find me</a>
+    <div id="info"><h1>CicLAvia : Pasadena</h1><div id="infobox"><h2>3.5 miles of Open Streets!</h2><p>Bike, walk and pogostick down Colorado Blvd!</p> </div> 
+    </div>
 	<script>
-        //Leaflet
-        //This variable calls out Leaflet to generate a map with a set of coordinates and zoom level
-        //The 'map' in the Leaflet callout will refer to the DIV with the same name
-		var map = L.map('map').setView([34.0500, -118.2500], 13);
+        L.mapbox.accessToken = 'pk.eyJ1IjoiY3J1emluNzN2dyIsImEiOiI3RDdhUi1NIn0.jaEqREZw7QQMRafKPNBdmA';    
+        var map = L.mapbox.map('map', 'cruzin73vw.lczhncdi','backtile')
+        .setView([34.147844, -118.144392], 16);
         
-        //Mapbox
-        //This variable calls out Mapbox to generate a map with a set of coordinates and zoom level
-        //var map = L.mapbox.map('map', 'mapbox.streets').setView([40, -74.50], 9);
+        //Code to add Basemaps
+        var baselayers = {
+        CicLAvia: L.mapbox.tileLayer('cruzin73vw.lczhncdi'),
+        Streets: L.mapbox.tileLayer('examples.map-i87786ca'), 
+        Satellite: L.mapbox.tileLayer('examples.map-igb471ik')
+        };
         
-        //This command calls out Leaflet to create a layer with an tileLayer from an external source
-		L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'examples.map-i875mjb7'
-		}).addTo(map);
+        L.control.layers(baselayers).addTo(map);
+        
+        //Create locations for geojson
+        var routes="data/ciclavia_route.geojson";
+        var hubs="data/ciclavia_hubs.geojson";
+        var landmarks="data/ciclavia_landmarks.geojson";
+        
+        //Style Hubs and add to Map
+        var featureLayer = L.mapbox.featureLayer(hubs,{
+            style:{
+                fillColor:"#ff7f00",
+                color: "#000",
+                weight: 0,
+                opacity: 0,
+                fillOpacity: 0.8
+                }
+        }).addTo(map).bindPopup("Hub");
+        
+        //Style Routes and add to Map
+        var featureLayer = L.mapbox.featureLayer(routes,{
+            style:{
+                color: "#ff78b4",
+                weight: 10,
+                },
+        }).addTo(map);
+        
+        //Style Landmarks and add to Map
+        var featureLayer = L.mapbox.featureLayer(landmarks,{
+            style:{
+                fillColor:"#ff7f00",
+                color: "#000",
+                weight: 0,
+                opacity: 0,
+                fillOpacity: 0.8
+                },
+            pointToLayer: function(feature, latlon) {
+            return L.circleMarker(latlon, 5);
+            }
+        }).addTo(map);
         
         
-        omnivore.csv('data/Bikes_Stolen_by_Location.csv').addTo(map);
-        /*
-		L.marker([51.5, -0.09]).addTo(map)
-			.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+        featureLayer.on('ready',function(){
+            featureLayer.eachLayer(function(layer){
+            layer.bindPopup("<h2>"+layer.feature.properties.Landmarks+"</h2>"+layer.feature.properties.Info);
+            });
+        });
         
-		L.circle([51.508, -0.11], 500, {
-			color: 'red',
-			fillColor: '#f03',
-			fillOpacity: 0.5
-		}).addTo(map).bindPopup("I am a circle.");
+        
+        //This code for GPS location
+        var geolocation = L.mapbox.featureLayer().addTo(map);
+        var mapbounds=map.getBounds();
+        console.log(mapbounds);
+        
+        var geolocate = document.getElementById('geolocate');
+        
+        if (!navigator.geolocation) {
+        geolocate.innerHTML = 'Geolocation is not available';
+        } else {
+        geolocate.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        map.locate();
+        };
+        }
+        map.on('locationfound', function(e) {
+            
+        if (mapbounds.contains([e.latlng.lng, e.latlng.lat])==true){
+        map.fitBounds(e.bounds);
 
-		L.polygon([
-			[51.509, -0.08],
-			[51.503, -0.06],
-			[51.51, -0.047]
-		]).addTo(map).bindPopup("I am a polygon.");
+        geolocation.setGeoJSON({
+        type: 'Feature',
+        geometry: {
+            type: 'Point',
+            coordinates: [e.latlng.lng, e.latlng.lat]
+        },
+        properties: {
+            'title': 'Here I am!',
+            'marker-color': '#ff8888',
+            'marker-symbol': 'star'
+        }
+        });
 
+        // And hide the geolocation button
+        geolocate.parentNode.removeChild(geolocate);
+        } else {alert("You must be in the City of Pasadena")}});
 
-		var popup = L.popup();
+        // If the user chooses not to allow their location
+        // to be shared, display an error message.
+        map.on('locationerror', function() {
+        geolocate.innerHTML = 'Position could not be found';
+        });
 
-		function onMapClick(e) {
-			popup
-				.setLatLng(e.latlng)
-				.setContent("You clicked the map at " + e.latlng.toString())
-				.openOn(map);
-		}
-
-		map.on('click', onMapClick);
-        */
 	</script>
 </body>
 </html>
